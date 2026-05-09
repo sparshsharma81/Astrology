@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "write-env": "node scripts/write-env.js",
-    "build": "npm run write-env && echo \"No build step required for static site.\"",
+    "build-env": "node scripts/write-env.js",
+    "build-app": "echo \"No build step required for static site.\"",
+    "build": "npm run build-env && npm run build-app",
     "serve": "npx http-server -c-1 ./ -p 3000",
-    "start": "node server.js",
-    "start-server": "node server.js"
+    "start": "npm run build && npm run serve",
+    "start-server": "npm run write-env && node server.js"
   },
   "devDependencies": {
     "http-server": "^14.1.1"
