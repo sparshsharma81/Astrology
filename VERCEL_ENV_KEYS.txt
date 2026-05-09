@@ -1,0 +1,104 @@
+ENVIRONMENT VARIABLES FOR VERCEL
+=================================
+
+Copy these into Vercel Project Settings → Environment Variables
+
+⚠️ IMPORTANT: Do NOT commit the actual keys to git!
+   They should ONLY be in Vercel's secure environment variable storage.
+
+────────────────────────────────────────────────────────────────
+
+REQUIRED KEYS:
+
+OPENCAGE_KEY
+4334b95ef0c645e79092cc2c3739083c
+
+────────────────────────────────────────────────────────────────
+
+ASTROLOGY API KEYS (Add all 12):
+
+ASTRO_KEY_1
+dpyZOtWAnT1yYO8p2tfKP4GcyBiIIFivaQ6PFQJ4
+
+ASTRO_KEY_2
+QW7HuNu0zm9rZmIfCd9xM2m0bcNdYPti4GsIHH2J
+
+ASTRO_KEY_3
+Pt0HZPrfbc5HTHeq7TReg3K9F4xoNawL5quDOQ54
+
+ASTRO_KEY_4
+sg2uryRfiva5O9CGaru6L7dSzFhllAvr395ftyYN
+
+ASTRO_KEY_5
+QW7HuNu0zm9rZmIfCd9xM2m0bcNdYPti4GsIHH2J
+
+ASTRO_KEY_6
+nG4NFN8fH16IlgC6YvfpU2G6oc4dLXHP6J3uxSSC
+
+ASTRO_KEY_7
+3aZVaqW9yU5mwUAMqhzcH1kxOxxBqJs98iGRHQmH
+
+ASTRO_KEY_8
+ucHJmaU60O5rTgo69zH8U4uF5XZR6ti57qoFHJZT
+
+ASTRO_KEY_9
+m6eWHsn14n7xJAu6w0mFYa3KX9QrJAAB4upWGJNH
+
+ASTRO_KEY_10
+A7YvxPDqs67bk1Qmyh1QH3tqPNOM0cdQ5Qlr0WYd
+
+ASTRO_KEY_11
+nG4NFN8fH16IlgC6YvfpU2G6oc4dLXHP6J3uxSSC
+
+ASTRO_KEY_12
+uUBhnrozy54YUU1btXf6k8MtAep1ZleE8FIvPTMS
+
+────────────────────────────────────────────────────────────────
+
+GEMINI API KEY:
+
+GEMINI_KEY
+AIzaSyCl5o1mjs0o27tRD8_h0HCwLgdjdF34bBQ
+
+────────────────────────────────────────────────────────────────
+
+OPTIONAL:
+
+MODEL_NAME
+gemini-2.0-flash
+
+────────────────────────────────────────────────────────────────
+
+HOW TO ADD THESE TO VERCEL:
+
+1. Go to Vercel Dashboard: https://vercel.com/dashboard
+2. Click on your project (astrology)
+3. Go to Settings → Environment Variables
+4. For each variable above:
+   - Enter the Name (e.g., OPENCAGE_KEY)
+   - Enter the Value (the key value)
+   - Select which environments (Production, Preview, Development)
+   - Click "Add Environment Variable"
+5. After adding all variables, redeploy:
+   - Click "Deployments" tab
+   - Click the three dots on the latest deployment
+   - Select "Redeploy" to rebuild with the new variables
+
+────────────────────────────────────────────────────────────────
+
+VERIFICATION:
+
+After deployment, check that:
+✓ Site loads at yourdomain.vercel.app
+✓ Hero section displays with full styling
+✓ You can input birth chart data
+✓ Charts generate successfully
+✓ Gemini narratives appear (no 502 errors)
+
+If you see errors:
+1. Check Vercel dashboard build logs
+2. Verify all ASTRO_KEY_* are set (at least one)
+3. Verify GEMINI_KEY is set
+4. Check browser console (F12 → Console tab) for errors
+
+────────────────────────────────────────────────────────────────

@@ -1,0 +1,10 @@
+node_modules
+.git
+.gitignore
+README.md
+README_DEPLOY.md
+ASTRO_COMPLETE_REFERENCE.js
+ASTRO_REFERENCE_FOR_CHATGPT.md
+QUICK_REFERENCE_CHATGPT.txt
+.env.local
+.env.*.local

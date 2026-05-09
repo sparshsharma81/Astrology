@@ -1,11 +1,11 @@
 // Vercel Serverless Function (Node)
 // Place under `api/gemini.js` for Vercel. It proxies requests to Google Generative API using a server-side key.
 
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  const GEMINI_KEY = process.env.GEMINI_KEY || process.env.GEMIN IKEY || process.env.GEMINIKEY;
+  const GEMINI_KEY = process.env.GEMINI_KEY || process.env.GEMINI_API_KEY || process.env.GEMINIKEY;
   if (!GEMINI_KEY) return res.status(500).json({ error: 'Server Gemini key not configured' });
 
   try {

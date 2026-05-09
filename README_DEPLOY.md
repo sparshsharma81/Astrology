@@ -1,58 +1,180 @@
-Deploying to Vercel / Render (static site)
+Deploying to Vercel
+===================
 
-1. Add environment variables in the platform UI:
-   - OPENCAGE_KEY
-   - GEMINI_KEY (only if you accept exposing it client-side; recommended: keep Gemini server-side)
-   - ASTRO_KEY_1, ASTRO_KEY_2, ... (optional)
-   - MODEL_NAME (optional)
+This application supports full deployment to Vercel with both static frontend and serverless backend API.
 
-2. Ensure the repo build command runs `node scripts/write-env.js` before publishing.
-   Example build command:
+Quick Start (Recommended)
+-------------------------
 
-   node scripts/write-env.js
+1. **Install Vercel CLI** (optional but helpful):
+   ```bash
+   npm install -g vercel
+   ```
 
-   This writes `env.js` at the project root which the client app reads at runtime.
+2. **Deploy directly from GitHub**:
+   - Go to https://vercel.com/new
+   - Select this GitHub repository
+   - Configure environment variables (see below)
+   - Click "Deploy"
 
-3. Vercel example (project settings):
-   - Build Command: `node scripts/write-env.js`
-   - Output Directory: `/` (root)
+Environment Variables on Vercel
+--------------------------------
 
-4. Render static site example:
-   - Build Command: `node scripts/write-env.js`
-   - Publish Directory: `/`
+In your Vercel project settings, add these environment variables:
 
-Server-side Gemini proxy (recommended)
--------------------------------------
-To avoid exposing your Gemini/Generative API key client-side, deploy a server-side proxy.
+| Variable | Value | Notes |
+|----------|-------|-------|
+| `OPENCAGE_KEY` | Your OpenCage API key | For geolocation/timezone lookup |
+| `ASTRO_KEY_1` through `ASTRO_KEY_12` | Your Astro API keys | Used for birth chart calculations |
+| `GEMINI_KEY` | Your Google Gemini API key | Used by `/api/gemini` serverless function |
+| `MODEL_NAME` | `gemini-2.0-flash` (or your preferred model) | Optional; defaults to `gemini-2.0-flash` |
 
-- Vercel: place `api/gemini.js` in the `api/` folder (already provided). Add `GEMINI_KEY` in the Vercel environment variables.
-- Render (or local server): use `server.js` which exposes `/api/gemini` and serves the static site. Add `GEMINI_KEY` in the Render service environment variables. Set the service `Start Command` to `node server.js`.
+How to Add Environment Variables:
+1. Go to your Vercel project dashboard
+2. Click "Settings" → "Environment Variables"
+3. Add each variable and its value
+4. Click "Save"
+5. Redeploy (or trigger a new deployment from GitHub)
 
-Client usage:
-- The app will call Google directly only if a client `geminiKey` is present in the `config` textarea or `window.__ENV.geminiKey`.
-- If no client key is available, the app will attempt to call `/api/gemini` (server proxy). The proxy uses `GEMINI_KEY` from the server environment.
+Build and Deployment Process
+------------------------------
 
-Local dev:
-- To run everything locally (static files + proxy):
+When you deploy, Vercel automatically:
 
-```bash
-npm install
-npm run write-env   # optional: writes env.js from local env vars
-npm run start       # starts Express server with proxy at /api/gemini
+1. **Builds the environment file**: Runs `node scripts/write-env.js` which:
+   - Reads environment variables you set in Vercel
+   - Generates `env.js` containing public-safe configuration
+   - Makes keys available to the frontend as `window.__ENV`
+
+2. **Deploys serverless API**: 
+   - Deploys `/api/gemini.js` as a serverless Node function
+   - Handles requests to `/api/gemini` (proxies to Google Generative API)
+   - Keeps `GEMINI_KEY` server-side secure
+
+3. **Serves static frontend**:
+   - Serves all `.html`, `.css`, `.js` files
+   - Routes all unmatched requests to `index.html` (SPA routing)
+   - CDN caches immutable assets
+
+How the Frontend Uses Environment Variables
+---------------------------------------------
+
+The frontend loads `env.js` which exposes `window.__ENV`:
+
+```javascript
+// env.js is auto-generated at build time and contains:
+window.__ENV = {
+  opencageKey: "...",
+  astroKey1: "...",
+  astroKey2: "...",
+  // ... up to astroKey12
+  geminiKey: "", // kept empty for server proxy use
+  modelName: "gemini-2.0-flash"
+}
 ```
 
-Or to quickly serve static files without proxy:
+The application checks:
+- If `window.__ENV.geminiKey` is present and not empty, it calls Google Generative API directly
+- Otherwise, it calls `/api/gemini` (server proxy) which uses the server-side `GEMINI_KEY`
+
+Security Recommendations
+------------------------
+
+✅ **What goes in `env.js` (public)**:
+- OpenCage API key (typically has rate limits but safe to expose)
+- Astro API keys (typically safe to expose if rate-limited)
+- Model name
+
+❌ **What stays server-side only**:
+- `GEMINI_KEY` in `api/gemini.js` – Use the serverless proxy, NOT client-side key
+
+Local Development
+-----------------
+
+Before deploying, test locally:
+
+1. **Create a `.env` file** (already exists):
+   ```env
+   OPENCAGE_KEY=your_key
+   ASTRO_KEY_1=your_key
+   GEMINI_KEY=your_key
+   MODEL_NAME=gemini-2.0-flash
+   ```
+
+2. **Generate env.js**:
+   ```bash
+   npm run write-env
+   ```
+
+3. **Start local server**:
+   ```bash
+   npm run serve
+   ```
+   Opens http://localhost:3000
+
+4. **Or run with Express (simulates server proxy)**:
+   ```bash
+   npm run start-server
+   ```
+
+Vercel Deployment Configuration
+--------------------------------
+
+The `vercel.json` file is pre-configured and contains:
+
+- **buildCommand**: `node scripts/write-env.js` – Generates `env.js` from environment variables
+- **builds**: Specifies `api/**/*.js` as Node serverless functions
+- **routes**: 
+  - `/api/*` → forwards to serverless API
+  - `/*` → serves static files; unmatched → `index.html` (SPA routing)
+
+Vercel CLI Deployment
+---------------------
+
+If you prefer using the CLI:
 
 ```bash
-npm run serve
+# Link to a Vercel project (first time)
+vercel
+
+# Deploy (automatically picks up environment variables from Vercel project)
+vercel --prod
+
+# Or set environment variables locally for testing
+vercel env pull
+npm run write-env
+vercel --prod
 ```
 
-Security:
-- Do not put private keys into `env.js` for public static sites. Use the server proxy for secrets.
+Troubleshooting
+---------------
 
-Security note:
-- `env.js` is public; do NOT put secrets you don't want exposed client-side. For secret server-only keys (Gemini), set up a serverless function to proxy requests and keep the secret on the server.
+**Issue**: Environment variables not showing up in the frontend
+**Solution**: Ensure `vercel.json` has `buildCommand: "node scripts/write-env.js"` and redeploy
 
-Optional improvements:
-- Create a serverless endpoint to call Gemini (recommended) so the model key stays secret.
-- Use `write-env.js` to selectively include only non-sensitive public keys.
+**Issue**: `/api/gemini` returns 500 error
+**Solution**: Check that `GEMINI_KEY` is set in Vercel environment variables
+
+**Issue**: Frontend can't connect to OpenCage
+**Solution**: Verify `OPENCAGE_KEY` is set and rate limit hasn't been exceeded
+
+**Issue**: Astrology charts not generating
+**Solution**: Ensure at least one `ASTRO_KEY_*` is set in Vercel environment
+
+Custom Domain
+-----------
+
+To use a custom domain:
+
+1. In Vercel dashboard, go to "Settings" → "Domains"
+2. Add your domain
+3. Update DNS records according to Vercel instructions
+4. Vercel automatically provisions SSL/TLS
+
+More Information
+---------------
+
+- Vercel Docs: https://vercel.com/docs
+- Environment Variables: https://vercel.com/docs/projects/environment-variables
+- Serverless Functions: https://vercel.com/docs/functions/serverless-functions
+
