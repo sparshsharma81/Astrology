@@ -15,7 +15,7 @@ app.use(bodyParser.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname), { maxAge: 0 }));
 
 app.post('/api/gemini', async (req, res) => {
-  const GEMINI_KEY = process.env.GEMINI_KEY || process.env.GEMIN IKEY || process.env.GEMINIKEY;
+  const GEMINI_KEY = process.env.GEMINI_KEY || process.env.GEMINIKEY || process.env.GEMINIKEY;
   if (!GEMINI_KEY) return res.status(500).json({ error: 'Server Gemini key not configured' });
   try {
     const { prompt, modelName = 'gemini-2.0-flash' } = req.body || {};
