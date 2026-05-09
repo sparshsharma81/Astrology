@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 
 // Build-time script for static deployments.
 // It reads process.env values and writes a client-side env.js exposing window.__ENV.
