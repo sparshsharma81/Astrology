@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const env = {
   opencageKey: process.env.OPENCAGE_KEY || process.env.OPENCAGEKEY || '',
-  geminiKey: process.env.GEMINI_KEY || process.env.GEMIN IKEY || process.env.GEMINIKEY || '',
+  geminiKey: process.env.GEMINI_KEY || process.env.GEMINIKEY || process.env.GEMINIKEY || '',
   modelName: process.env.MODEL_NAME || process.env.MODELNAME || 'gemini-2.0-flash'
 };
 

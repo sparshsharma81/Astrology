@@ -2,6 +2,7 @@
   "name": "astro-scope",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "write-env": "node scripts/write-env.js",
     "build": "npm run write-env && echo \"No build step required for static site.\"",
